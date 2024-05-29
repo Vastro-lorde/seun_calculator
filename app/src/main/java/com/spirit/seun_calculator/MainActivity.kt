@@ -5,6 +5,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.isDigitsOnly
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -48,6 +49,66 @@ class MainActivity : AppCompatActivity() {
         val btn8 = findViewById<Button>(R.id.btn_8)
         val btn9 = findViewById<Button>(R.id.btn_9)
 
+        // List of buttons that should add to the expression display
+        val buttons = listOf(
+            decimalBtn, percentBtn, plusBtn, minusBtn, multiplyBtn, divideBtn,
+            btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9
+        )
 
+        // Set up click listeners for these buttons`
+        buttons.forEach { button ->
+            button.setOnClickListener {
+                    val buttonText = button.text.toString()
+                    val resultDisplayText = resultDisplay.text.toString()
+                    if (resultDisplayText == getString(R.string.default_value)) {
+                        resultDisplay.text = ""
+                    }
+                    addToDisplay(resultDisplay, buttonText)
+                    if (!buttonText.isDigitsOnly() && buttonText != "." && buttonText != "%") {
+                        addToDisplay(expressionDisplay, "$resultDisplayText$buttonText")
+                        resultDisplay.text = getString(R.string.default_value)
+                    }
+
+            }
+        }
+
+        //setting up clear button on click listener
+        clearBtn.setOnClickListener {
+            expressionDisplay.text = ""
+            resultDisplay.text = getString(R.string.default_value)
+        }
+
+        clearEntryBtn.setOnClickListener {
+            resultDisplay.text = getString(R.string.default_value)
+        }
+
+        delBtn.setOnClickListener {
+            val currentText = resultDisplay.text.toString()
+            if (currentText.isNotEmpty()) {
+                val newText = currentText.substring(0, currentText.length - 1)
+                if (newText.isEmpty()) {
+                    resultDisplay.text = getString(R.string.default_value)
+                } else {
+                    resultDisplay.text = newText
+                }
+            }
+        }
+        equalsBtn.setOnClickListener {
+            val expression = expressionDisplay.text.toString()
+            val result = evaluateExpression(expression)
+            resultDisplay.text = result.toString()
+        }
+
+    }
+
+
+    private fun addToDisplay(displayText: TextView, text: String) {
+        val currentText = displayText.text.toString()
+        val newText = "$currentText$text"
+        displayText.text = newText
+    }
+
+    private fun evaluateExpression(expression: String) {
+        println(expression)
     }
 }
